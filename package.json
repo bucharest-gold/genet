@@ -1,0 +1,41 @@
+{
+  "name": "genet",
+  "version": "0.0.1",
+  "description": "A node.js profiling tool",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js lib/*.js test/*.js",
+    "test": "tape test/*.js",
+    "prepublish": "nsp check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bucharest-gold/genet.git"
+  },
+  "keywords": [
+    "profile",
+    "cpu",
+    "benchmark",
+    "performance",
+    "tracing"
+  ],
+  "author": "Lance Ball <lanceball@gmail.com> (http://lanceball.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/bucharest-gold/genet/issues"
+  },
+  "homepage": "https://github.com/bucharest-gold/genet#readme",
+  "dependencies": {
+    "v8-profiler": "^5.6.5"
+  },
+  "devDependencies": {
+    "eslint": "^3.4.0",
+    "eslint-config-semistandard": "^7.0.0-beta.0",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-react": "^6.2.0",
+    "eslint-plugin-standard": "^2.0.0",
+    "nsp": "^2.6.1",
+    "tape": "^4.6.0"
+  }
+}
