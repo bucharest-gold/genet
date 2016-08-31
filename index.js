@@ -23,13 +23,14 @@ function start (options) {
   };
   Object.assign(opts, options);
 
+  opts.outputFile = nameGenerator(opts.outputFile);
   const logger = getLogger(opts.verbose);
   logger('Application profiling starting');
   profiler.startProfiling(opts, true);
   setTimeout(() => {
     const profile = profiler.stopProfiling('');
     profile.export()
-      .pipe(fs.createWriteStream(nameGenerator(opts.outputFile)))
+      .pipe(fs.createWriteStream(opts.outputFile))
       .once('error', profiler.deleteAllProfiles)
       .once('finish', () => {
         profiler.deleteAllProfiles;
@@ -61,7 +62,7 @@ function nameGenerator (generator) {
 }
 
 function processFile () {
-  const profile = JSON.parse(fs.readFileSync(nameGenerator(opts.outputFile), 'utf8'));
+  const profile = JSON.parse(fs.readFileSync(opts.outputFile, 'utf8'));
   return processor(profile).process();
 }
 
@@ -164,7 +165,7 @@ function fileReport (filter) {
     }
     return 0;
   });
-  let fileName = nameGenerator(opts.outputFile).split('.')[0];
+  let fileName = opts.outputFile.split('.')[0];
   fileName += '.json';
   fs.writeFile(fileName, JSON.stringify(nodes, null, 2), (error) => {
     if (error) return console.error(error);
