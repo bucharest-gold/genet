@@ -106,8 +106,10 @@ function goodFunctionName (functionName) {
 
 function createTable (nodes) {
   let table = new Table({
+    colWidths: [20, null, 8, 8],
     head: ['Function', 'File', 'Line', 'Time']
   });
+
   nodes.reverse();
   nodes.forEach(n => {
     const row = [];
@@ -120,6 +122,7 @@ function createTable (nodes) {
       }
       let file = n.func.split(' ')[1];
       file = file.split(':')[0];
+      file = addNewLine(file, 35).join('\n');
       row.push(file);
       let lineNumber = n.func.split(':')[1];
       row.push(lineNumber);
@@ -128,6 +131,14 @@ function createTable (nodes) {
     }
   });
   return table.toString();
+}
+
+function addNewLine (filePath, n) {
+  let content = [];
+  for (let i = 0; i < filePath.length; i += n) {
+    content.push(filePath.substr(i, n));
+  }
+  return content;
 }
 
 function fileReport (filter) {
