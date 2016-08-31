@@ -95,7 +95,8 @@ function consoleReport (filter) {
     }
     return 0;
   });
-  console.log(createTable(nodes));
+  const logger = getLogger(opts.verbose);
+  logger(createTable(nodes));
 }
 
 function goodFunctionName (functionName) {
