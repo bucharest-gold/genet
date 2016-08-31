@@ -18,6 +18,7 @@ function start (options) {
     duration: 5000,
     verbose: false,
     report: true,
+    showAppOnly: false,
     filter: ''
   };
   Object.assign(opts, options);
@@ -99,6 +100,14 @@ function consoleReport (filter) {
   logger(createTable(nodes));
 }
 
+function discardModules (node, showAppOnly) {
+  if (showAppOnly) {
+    let file = node.func.split(' ')[1];
+    return file.includes('node_modules');
+  }
+  return false;
+}
+
 function goodFunctionName (functionName) {
   return !functionName.includes('app.(anonymous') &&
          !functionName.includes('function)') &&
@@ -128,7 +137,9 @@ function createTable (nodes) {
       let lineNumber = n.func.split(':')[1];
       row.push(lineNumber);
       row.push(n.depth);
-      table.push(row);
+      if (!discardModules(n, opts.showAppOnly)) {
+        table.push(row);
+      }
     }
   });
   return table.toString();
