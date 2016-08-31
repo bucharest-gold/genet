@@ -60,7 +60,7 @@ function nameGenerator (generator) {
 }
 
 function processFile () {
-  const profile = JSON.parse(fs.readFileSync(opts.outputFile, 'utf8'));
+  const profile = JSON.parse(fs.readFileSync(nameGenerator(opts.outputFile), 'utf8'));
   return processor(profile).process();
 }
 
@@ -98,26 +98,34 @@ function consoleReport (filter) {
   console.log(createTable(nodes));
 }
 
+function goodFunctionName (functionName) {
+  return !functionName.includes('app.(anonymous') &&
+         !functionName.includes('function)') &&
+         !functionName.includes('object.(anonymous');
+}
+
 function createTable (nodes) {
   let table = new Table({
     head: ['Function', 'File', 'Line', 'Time']
   });
-
+  nodes.reverse();
   nodes.forEach(n => {
     const row = [];
     let functionName = n.func.split(' ')[0];
-    if (functionName) {
-      row.push(functionName);
-    } else {
-      row.push('N/A');
+    if (goodFunctionName(functionName)) {
+      if (functionName) {
+        row.push(functionName);
+      } else {
+        row.push('N/A');
+      }
+      let file = n.func.split(' ')[1];
+      file = file.split(':')[0];
+      row.push(file);
+      let lineNumber = n.func.split(':')[1];
+      row.push(lineNumber);
+      row.push(n.depth);
+      table.push(row);
     }
-    let file = n.func.split(' ')[1];
-    file = file.split(':')[0];
-    row.push(file);
-    let lineNumber = n.func.split(':')[1];
-    row.push(lineNumber);
-    row.push(n.depth);
-    table.push(row);
   });
   return table.toString();
 }
@@ -133,7 +141,9 @@ function fileReport (filter) {
     }
     return 0;
   });
-  fs.writeFile('./report.json', JSON.stringify(nodes, null, 2), (err) => {
-    if (err) return console.log(err);
+  let fileName = nameGenerator(opts.outputFile).split('.')[0];
+  fileName += '.json';
+  fs.writeFile(fileName, JSON.stringify(nodes, null, 2), (error) => {
+    if (error) return console.error(error);
   });
 }
