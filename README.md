@@ -15,7 +15,8 @@ near the start.
       duration: 5000, // default 5000 (ms)
       verbose: true, // default false
       report: false, // default true
-      filter: 'myApp' // default ''
+      filter: 'myApp' // default '',
+      showAppOnly: true, // default false
     });
 
 The `outputFile` option can be a name, or a function. If you
@@ -23,4 +24,6 @@ provide a function, it will be called and the return value will
 be used as the output file location. By default, the value is
 ``./prof-${Date.now()}.cpuprofile``.
 
-By default a `report.json` will be created.
+## Console report
+
+![alt example](https://cloud.githubusercontent.com/assets/6443576/18143076/e99fca90-6f96-11e6-8bf2-da3ebaacdd8d.png)
