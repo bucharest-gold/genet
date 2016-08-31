@@ -165,9 +165,11 @@ function fileReport (filter) {
     }
     return 0;
   });
-  let fileName = opts.outputFile.split('.')[0];
-  fileName += '.json';
-  fs.writeFile(fileName, JSON.stringify(nodes, null, 2), (error) => {
+  let fileName = opts.outputFile;
+  fileName += '.txt';
+  let content = createTable(nodes);
+  content = content.split(/\u001b\[(?:\d*;){0,5}\d*m/g).join('');
+  fs.writeFile(fileName, content, (error) => {
     if (error) return console.error(error);
   });
 }
