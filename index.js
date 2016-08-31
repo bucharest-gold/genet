@@ -3,6 +3,7 @@
 const profiler = require('v8-profiler');
 const fs = require('fs');
 const processor = require('./cpuprofile-processor');
+const Table = require('cli-table2');
 
 module.exports = exports = {
   start
@@ -94,7 +95,31 @@ function consoleReport (filter) {
     }
     return 0;
   });
-  nodes.forEach(n => console.log(n));
+  console.log(createTable(nodes));
+}
+
+function createTable (nodes) {
+  let table = new Table({
+    head: ['Function', 'File', 'Line', 'Time']
+  });
+
+  nodes.forEach(n => {
+    const row = [];
+    let functionName = n.func.split(' ')[0];
+    if (functionName) {
+      row.push(functionName);
+    } else {
+      row.push('N/A');
+    }
+    let file = n.func.split(' ')[1];
+    file = file.split(':')[0];
+    row.push(file);
+    let lineNumber = n.func.split(':')[1];
+    row.push(lineNumber);
+    row.push(n.depth);
+    table.push(row);
+  });
+  return table.toString();
 }
 
 function fileReport (filter) {
