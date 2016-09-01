@@ -1,19 +1,80 @@
 'use strict';
 
-const profiler = require('v8-profiler');
+// Node.js builtin module
 const fs = require('fs');
+
+// some profiler dependencies
+const profiler = require('v8-profiler');
 const processor = require('flamegraph/lib/cpuprofile-processor');
-const fromStream = require('flamegraph/from-stream');
-const Table = require('cli-table2');
 
-module.exports = exports = {
-  start
-};
+// Builtin reporters
+const flamegraphReporter = require('./lib/flamegraph_reporter');
+const consoleReporter = require('./lib/console_reporter');
+const fileReporter = require('./lib/file_reporter');
 
-let opts = {};
+// const Symbols for property accessors
+const OPTIONS = Symbol('options');
+const LOGGER = Symbol('logger');
+const SIGNIFICANT_NODES = Symbol('significant_nodes');
 
-function start (options) {
-  opts = {
+class Genet {
+  constructor (options) {
+    const opts = getOptions(options);
+    opts.outputFile = typeof opts.outputFile === 'function'
+                      ? opts.outputFile()
+                      : opts.outputFile.toString();
+    this[OPTIONS] = opts;
+    this[LOGGER] = opts.verbose ? console.log : (_) => _;
+  }
+
+  start () {
+    const opts = this[OPTIONS];
+    const log = this[LOGGER];
+
+    log('Application profiling starting');
+    profiler.startProfiling(opts, true);
+    setTimeout(() => {
+      const profile = profiler.stopProfiling('');
+      profile.export()
+        .pipe(fs.createWriteStream(opts.outputFile))
+        .once('error', profiler.deleteAllProfiles)
+        .once('finish', () => {
+          profiler.deleteAllProfiles;
+
+          // we only need to do this once for all reports
+          this[SIGNIFICANT_NODES] = getSignificantNodes(this);
+
+          // generate reports
+          consoleReporter(this);
+          fileReporter(this);
+          if (opts.flamegraph) {
+            flamegraphReporter(this);
+          }
+        });
+      profiler.deleteAllProfiles();
+      log('Application profiling stopped');
+    }, opts.duration);
+  }
+
+  get log () {
+    return this[LOGGER];
+  }
+
+  get filter () {
+    return this[OPTIONS].filter;
+  }
+
+  get outputFile () {
+    return this[OPTIONS].outputFile;
+  }
+
+  get significantNodes () {
+    return this[SIGNIFICANT_NODES];
+  }
+}
+
+function getOptions (options) {
+  const opts = {
     profileName: 'genet',
     outputFile: defaultFilename,
     duration: 5000,
@@ -23,59 +84,24 @@ function start (options) {
     filter: ''
   };
   Object.assign(opts, options);
-
-  opts.outputFile = nameGenerator(opts.outputFile);
-  const logger = getLogger(opts.verbose);
-  logger('Application profiling starting');
-  profiler.startProfiling(opts, true);
-  setTimeout(() => {
-    const profile = profiler.stopProfiling('');
-    profile.export()
-      .pipe(fs.createWriteStream(opts.outputFile))
-      .once('error', profiler.deleteAllProfiles)
-      .once('finish', () => {
-        profiler.deleteAllProfiles;
-        consoleReport(opts.filter);
-        fileReport(opts.filter);
-        if (opts.flamegraph) {
-          flameReport();
-        }
-      });
-    profiler.deleteAllProfiles();
-    logger('Application profiling stopped');
-  }, opts.duration);
-}
-
-function getLogger (shouldLog) {
-  return shouldLog ? console.log : () => {
-  };
+  return opts;
 }
 
 function defaultFilename () {
   return `./prof-${Date.now()}.cpuprofile`;
 }
 
-function nameGenerator (generator) {
-  if (typeof generator === 'function') {
-    return generator();
-  } else {
-    return generator.toString();
-  }
-}
+function getSignificantNodes (genet) {
+  const parsed = processor(
+    JSON.parse(fs.readFileSync(genet.outputFile, 'utf8')))
+    .process();
 
-function processFile () {
-  const profile = JSON.parse(fs.readFileSync(opts.outputFile, 'utf8'));
-  return processor(profile).process();
-}
-
-function significantNodes (filter) {
-  const parsed = processFile();
   const nodes = [];
   Object.keys(parsed.nodes).map((i) => {
     let node = parsed.nodes[i];
     if (node.func.toString().includes('.js')) {
-      if (filter) {
-        if (node.func.toString().includes(filter)) {
+      if (genet.filter) {
+        if (node.func.toString().includes(genet.filter)) {
           node.depth = node.etime - node.stime;
           nodes.push(node);
         }
@@ -88,96 +114,4 @@ function significantNodes (filter) {
   return nodes;
 }
 
-function consoleReport (filter) {
-  let nodes = significantNodes(filter);
-  nodes.sort((a, b) => {
-    if (a.depth > b.depth) {
-      return 1;
-    }
-    if (a.depth < b.depth) {
-      return -1;
-    }
-    return 0;
-  });
-  const logger = getLogger(opts.verbose);
-  logger(createTable(nodes));
-}
-
-function discardModules (node, showAppOnly) {
-  if (showAppOnly) {
-    let file = node.func.split(' ')[1];
-    return file.includes('node_modules');
-  }
-  return false;
-}
-
-function goodFunctionName (functionName) {
-  return !functionName.includes('app.(anonymous') &&
-    !functionName.includes('function)') &&
-    !functionName.includes('object.(anonymous');
-}
-
-function createTable (nodes) {
-  let table = new Table({
-    colWidths: [20, null, 8, 8],
-    head: ['Function', 'File', 'Line', 'Time']
-  });
-
-  nodes.reverse();
-  nodes.forEach(n => {
-    const row = [];
-    let functionName = n.func.split(' ')[0];
-    if (goodFunctionName(functionName)) {
-      if (functionName) {
-        row.push(functionName);
-      } else {
-        row.push('N/A');
-      }
-      let file = n.func.split(' ')[1];
-      file = file.split(':')[0];
-      file = addNewLine(file, 35).join('\n');
-      row.push(file);
-      let lineNumber = n.func.split(':')[1];
-      row.push(lineNumber);
-      row.push(n.depth);
-      if (!discardModules(n, opts.showAppOnly)) {
-        table.push(row);
-      }
-    }
-  });
-  return table.toString();
-}
-
-function addNewLine (filePath, n) {
-  let content = [];
-  for (let i = 0; i < filePath.length; i += n) {
-    content.push(filePath.substr(i, n));
-  }
-  return content;
-}
-
-function fileReport (filter) {
-  let nodes = significantNodes(filter);
-  nodes.sort((a, b) => {
-    if (a.depth > b.depth) {
-      return 1;
-    }
-    if (a.depth < b.depth) {
-      return -1;
-    }
-    return 0;
-  });
-  let fileName = opts.outputFile;
-  fileName += '.txt';
-  let content = createTable(nodes);
-  content = content.split(/\u001b\[(?:\d*;){0,5}\d*m/g).join('');
-  fs.writeFile(fileName, content, (error) => {
-    if (error) return console.error(error);
-  });
-}
-
-function flameReport () {
-  let stream = fs.createReadStream(opts.outputFile);
-  const svg = fs.createWriteStream(opts.outputFile + '.svg');
-  fromStream(stream, {inputtype: 'cpuprofile'}).pipe(svg);
-}
+module.exports = exports = Genet;
