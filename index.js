@@ -2,7 +2,8 @@
 
 const profiler = require('v8-profiler');
 const fs = require('fs');
-const processor = require('./cpuprofile-processor');
+const processor = require('flamegraph/lib/cpuprofile-processor');
+const fromStream = require('flamegraph/from-stream');
 const Table = require('cli-table2');
 
 module.exports = exports = {
@@ -17,8 +18,8 @@ function start (options) {
     outputFile: defaultFilename,
     duration: 5000,
     verbose: false,
-    report: true,
     showAppOnly: false,
+    flamegraph: false,
     filter: ''
   };
   Object.assign(opts, options);
@@ -34,9 +35,10 @@ function start (options) {
       .once('error', profiler.deleteAllProfiles)
       .once('finish', () => {
         profiler.deleteAllProfiles;
-        if (opts.report) {
-          consoleReport(opts.filter);
-          fileReport(opts.filter);
+        consoleReport(opts.filter);
+        fileReport(opts.filter);
+        if (opts.flamegraph) {
+          flameReport();
         }
       });
     profiler.deleteAllProfiles();
@@ -111,8 +113,8 @@ function discardModules (node, showAppOnly) {
 
 function goodFunctionName (functionName) {
   return !functionName.includes('app.(anonymous') &&
-         !functionName.includes('function)') &&
-         !functionName.includes('object.(anonymous');
+    !functionName.includes('function)') &&
+    !functionName.includes('object.(anonymous');
 }
 
 function createTable (nodes) {
@@ -172,4 +174,10 @@ function fileReport (filter) {
   fs.writeFile(fileName, content, (error) => {
     if (error) return console.error(error);
   });
+}
+
+function flameReport () {
+  let stream = fs.createReadStream(opts.outputFile);
+  const svg = fs.createWriteStream(opts.outputFile + '.svg');
+  fromStream(stream, {inputtype: 'cpuprofile'}).pipe(svg);
 }
