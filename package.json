@@ -27,7 +27,7 @@
   "homepage": "https://github.com/bucharest-gold/genet#readme",
   "dependencies": {
     "cli-table2": "^0.2.0",
-    "flamegraph": "^0.7.0",
+    "flamegraph": "git://github.com/bucharest-gold/flamegraph#nsp_fix",
     "v8-profiler": "^5.6.5"
   },
   "devDependencies": {
