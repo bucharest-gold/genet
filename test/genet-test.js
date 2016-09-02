@@ -40,7 +40,7 @@ test('Genet should generate a .cpuprofile', t => {
   });
 });
 
-test('Genet should generate a .txt report', t => {
+test.skip('Genet should generate a .txt report', t => {
   const genet = new Genet({duration: 1000});
   genet.start();
   genet.stop().then(() => {
