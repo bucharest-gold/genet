@@ -17,8 +17,26 @@
 'use strict';
 
 const test = require('tape');
-const genet = require('../index');
+const fs = require('fs');
+const Genet = require('../index');
 
-test('Should foo.', t => {
+test('Should start.', t => {
+  let genet = new Genet({duration: 500});
   genet.start();
+  t.end();
+});
+
+test.onFinish(() => {
+  fs.readdir('./', (e, files) => {
+    if (e) {
+      console.error(e);
+    }
+    let fileFound = false;
+    files.forEach(file => {
+      if (file.includes('.cpuprofile')) {
+        fileFound = true;
+      }
+    });
+    console.log(fileFound);
+  });
 });
