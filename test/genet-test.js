@@ -48,10 +48,7 @@ test.onFinish(() => {
     }
     files.forEach((file) => {
       if (file.includes('.cpuprofile')) {
-        console.log('Removing', file);
         fs.unlinkSync(file);
-      } else {
-        console.log('Skipping', file);
       }
     });
   });
