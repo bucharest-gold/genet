@@ -1,5 +1,20 @@
 # genet
 
+[![Build Status](https://travis-ci.org/bucharest-gold/genet.svg?branch=master)](https://travis-ci.org/bucharest-gold/genet) [![Known Vulnerabilities](https://snyk.io/test/npm/genet/badge.svg)](https://snyk.io/test/npm/genet) [![dependencies Status](https://david-dm.org/bucharest-gold/genet/status.svg)](https://david-dm.org/bucharest-gold/genet)
+
+[![NPM](https://nodei.co/npm/genet.png)](https://npmjs.org/package/genet)
+
+A Node.js application profiling tool.
+
+|                 | Project Info  |
+| --------------- | ------------- |
+| License:        | Apache-2.0  |
+| Build:          | make  |
+| Documentation:  | http://bucharest-gold.github.io/genet/  |
+| Issue tracker:  | https://github.com/bucharest-gold/genet/issues  |
+| Engines:        | Node.js 4.x, 5.x, 6.x
+
+
 This is a simple Node.js profiling tool. Use it like this.
 First add it to your project.
 
