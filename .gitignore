@@ -1,5 +1,5 @@
 node_modules
 *.cpuprofile
-*.txt
+*.cpuprofile.txt
 *.svg
 *.log
