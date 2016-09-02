@@ -27,6 +27,9 @@ test('Should start.', t => {
 });
 
 test.onFinish(() => {
+  let currentTime = new Date().getTime();
+  while (currentTime + 5000 >= new Date().getTime()) { }
+
   fs.readdir('./', (e, files) => {
     if (e) {
       console.error(e);
