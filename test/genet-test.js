@@ -40,6 +40,53 @@ test('Genet should generate a .cpuprofile', t => {
   });
 });
 
+test('Genet should generate a .txt report', t => {
+  const genet = new Genet({duration: 1000});
+  genet.start();
+  genet.stop().then(() => {
+    fs.readdir(`${__dirname}/../`, (e, files) => {
+      if (e) {
+        console.error(e);
+        return;
+      }
+      let fileFound = false;
+      files.find(file => {
+        fileFound = file.endsWith('.cpuprofile.txt');
+        return fileFound;
+      });
+      t.ok(fileFound, true);
+    });
+    t.end();
+  });
+});
+
+test('Output file as a function', t => {
+  const genet = new Genet({
+    outputFile: () => {
+      return 'test-output-filename';
+    }
+  });
+  t.equals(genet.outputFile, 'test-output-filename');
+  t.end();
+});
+
+test('Output file as a string', t => {
+  const genet = new Genet({
+    outputFile: 'foo.txt'
+  });
+  t.equals(genet.outputFile, 'foo.txt');
+  t.end();
+});
+
+test('Output file as somethingn else', t => {
+  const date = new Date();
+  const genet = new Genet({
+    outputFile: date
+  });
+  t.equals(genet.outputFile, date.toString());
+  t.end();
+});
+
 test.onFinish(() => {
   fs.readdir(`${__dirname}/../`, (e, files) => {
     if (e) {
