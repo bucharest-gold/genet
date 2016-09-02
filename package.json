@@ -19,7 +19,8 @@
     "performance",
     "tracing"
   ],
-  "author": "Lance Ball <lanceball@gmail.com> (http://lanceball.com)",
+  "contributors": ["Lance Ball <lanceball@gmail.com> (http://lanceball.com)",
+                   "Helio Frota <hesilva@redhat.com>"],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/bucharest-gold/genet/issues"
