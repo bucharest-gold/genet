@@ -6,6 +6,7 @@ const fs = require('fs');
 // some profiler dependencies
 const profiler = require('v8-profiler');
 const processor = require('flamegraph/lib/cpuprofile-processor');
+const Fidelity = require('fidelity');
 
 // Builtin reporters
 const flamegraphReporter = require('./lib/flamegraph_reporter');
@@ -13,8 +14,10 @@ const consoleReporter = require('./lib/console_reporter');
 const fileReporter = require('./lib/file_reporter');
 
 // const Symbols for property accessors
-const OPTIONS = Symbol('options');
 const LOGGER = Symbol('logger');
+const OPTIONS = Symbol('options');
+const STOPPED = Symbol('stopped');
+const TIMEOUT = Symbol('timeout');
 const SIGNIFICANT_NODES = Symbol('significant_nodes');
 
 class Genet {
@@ -24,36 +27,61 @@ class Genet {
                       ? opts.outputFile()
                       : opts.outputFile.toString();
     this[OPTIONS] = opts;
+    this[STOPPED] = true;
     this[LOGGER] = opts.verbose ? console.log : (_) => _;
   }
 
   start () {
     const opts = this[OPTIONS];
-    const log = this[LOGGER];
 
-    log('Application profiling starting');
-    profiler.startProfiling(opts, true);
-    setTimeout(() => {
-      const profile = profiler.stopProfiling('');
-      profile.export()
-        .pipe(fs.createWriteStream(opts.outputFile))
-        .once('error', profiler.deleteAllProfiles)
-        .once('finish', () => {
-          profiler.deleteAllProfiles;
+    if (this[STOPPED]) {
+      this[STOPPED] = false;
+      this.log('Application profiling starting');
+      profiler.startProfiling(opts, true);
+      this[TIMEOUT] = setTimeout(this.stop, opts.duration);
+    } else {
+      console.error('Profiler already running');
+    }
+  }
 
-          // we only need to do this once for all reports
-          this[SIGNIFICANT_NODES] = getSignificantNodes(this);
+  stop () {
+    if (!this[STOPPED]) {
+      const promise = new Fidelity((resolve, reject) => {
+        clearTimeout(this[TIMEOUT]);
 
-          // generate reports
-          consoleReporter(this);
-          fileReporter(this);
-          if (opts.flamegraph) {
-            flamegraphReporter(this);
-          }
-        });
-      profiler.deleteAllProfiles();
-      log('Application profiling stopped');
-    }, opts.duration);
+        this[TIMEOUT] = null;
+        this[STOPPED] = true;
+
+        const opts = this[OPTIONS];
+        const profile = profiler.stopProfiling('');
+
+        profile.export()
+          .pipe(fs.createWriteStream(opts.outputFile))
+          .once('error', (e) => {
+            profiler.deleteAllProfiles();
+            reject(e);
+          })
+          .once('finish', () => {
+            profiler.deleteAllProfiles();
+
+            // we only need to do this once for all reports
+            this[SIGNIFICANT_NODES] = getSignificantNodes(this);
+
+            // generate reports
+            consoleReporter(this);
+            fileReporter(this);
+            if (opts.flamegraph) {
+              flamegraphReporter(this);
+            }
+          });
+        profiler.deleteAllProfiles();
+        this.log('Application profiling stopped');
+        resolve();
+      });
+      return promise;
+    } else {
+      return Fidelity.resolve();
+    }
   }
 
   get log () {

@@ -20,26 +20,39 @@ const test = require('tape');
 const fs = require('fs');
 const Genet = require('../index');
 
-test('Should start.', t => {
-  let genet = new Genet({duration: 500});
+test('Genet should generate a .cpuprofile', t => {
+  const genet = new Genet({duration: 1000});
   genet.start();
-  t.end();
+  genet.stop().then(() => {
+    fs.readdir(`${__dirname}/../`, (e, files) => {
+      if (e) {
+        console.error(e);
+        return;
+      }
+      let fileFound = false;
+      files.find(file => {
+        fileFound = file.endsWith('.cpuprofile');
+        return fileFound;
+      });
+      t.ok(fileFound, true);
+    });
+    t.end();
+  });
 });
 
 test.onFinish(() => {
-  let currentTime = new Date().getTime();
-  while (currentTime + 5000 >= new Date().getTime()) { }
-
-  fs.readdir('./', (e, files) => {
+  fs.readdir(`${__dirname}/../`, (e, files) => {
     if (e) {
       console.error(e);
+      return;
     }
-    let fileFound = false;
-    files.forEach(file => {
+    files.forEach((file) => {
       if (file.includes('.cpuprofile')) {
-        fileFound = true;
+        console.log('Removing', file);
+        fs.unlinkSync(file);
+      } else {
+        console.log('Skipping', file);
       }
     });
-    console.log(fileFound);
   });
 });

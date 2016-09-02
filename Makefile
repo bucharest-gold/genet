@@ -9,6 +9,8 @@ lint: node_modules
 
 clean:
 	rm -rf node_modules
+	rm *.cpuprofile
+	rm *.cpuprofile.txt
 
 node_modules: package.json
 	npm install
