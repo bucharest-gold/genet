@@ -31,13 +31,14 @@ const profile = new Genet({
     duration: 5000, // default 5000 (ms)
     verbose: true, // default false
     report: false, // default true
-    filter: 'myApp' // default '',
     showAppOnly: true, // default false
     flamegraph: true, // Generates a flamegraph.svg file - default false
     filter: 'myModule' // Filter data to only include 'myModule' - default ''
 });
 profile.start();
 ```
+
+### Example using
 
 The `outputFile` option can be a name, or a function. If you
 provide a function, it will be called and the return value will

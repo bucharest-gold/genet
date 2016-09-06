@@ -20,7 +20,7 @@ const test = require('tape');
 const fs = require('fs');
 const Genet = require('../index');
 
-test('Genet should generate a .cpuprofile', t => {
+test('Should generate a .cpuprofile', t => {
   const genet = new Genet({duration: 1000});
   genet.start();
   genet.stop().then(() => {
@@ -40,7 +40,7 @@ test('Genet should generate a .cpuprofile', t => {
   });
 });
 
-test.skip('Genet should generate a .txt report', t => {
+test.skip('Should generate a .txt report', t => {
   const genet = new Genet({duration: 1000});
   genet.start();
   genet.stop().then(() => {
@@ -60,7 +60,7 @@ test.skip('Genet should generate a .txt report', t => {
   });
 });
 
-test('Output file as a function', t => {
+test('Should output file as a function', t => {
   const genet = new Genet({
     outputFile: () => {
       return 'test-output-filename';
@@ -70,7 +70,7 @@ test('Output file as a function', t => {
   t.end();
 });
 
-test('Output file as a string', t => {
+test('Should output file as a string', t => {
   const genet = new Genet({
     outputFile: 'foo.txt'
   });
@@ -78,7 +78,7 @@ test('Output file as a string', t => {
   t.end();
 });
 
-test('Output file as somethingn else', t => {
+test('Should output file as something else', t => {
   const date = new Date();
   const genet = new Genet({
     outputFile: date
