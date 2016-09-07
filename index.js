@@ -48,7 +48,6 @@ class Genet {
     const opts = this[OPTIONS];
 
     if (!this[STOPPED]) {
-
       clearTimeout(this[TIMEOUT]);
       this[STOPPED] = true;
       this[TIMEOUT] = null;
@@ -96,7 +95,7 @@ function generateReports (genet, flamegraph) {
     if (flamegraph) {
       flamegraphReporter(genet);
     }
-  }
+  };
 }
 
 function getOptions (options) {
