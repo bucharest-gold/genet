@@ -37,7 +37,7 @@ class Genet {
     if (this[STOPPED]) {
       this[STOPPED] = false;
       this.log('Application profiling starting');
-      profiler.startProfiling(opts, true);
+      profiler.startProfiling(opts.profileName, true);
       this[TIMEOUT] = setTimeout(this.stop, opts.duration);
     } else {
       console.error('Profiler already running');
@@ -45,37 +45,21 @@ class Genet {
   }
 
   stop () {
+    const opts = this[OPTIONS];
+
     if (!this[STOPPED]) {
+
+      clearTimeout(this[TIMEOUT]);
+      this[STOPPED] = true;
+      this[TIMEOUT] = null;
+
       const promise = new Fidelity((resolve, reject) => {
-        clearTimeout(this[TIMEOUT]);
-
-        this[TIMEOUT] = null;
-        this[STOPPED] = true;
-
-        const opts = this[OPTIONS];
-        const profile = profiler.stopProfiling('');
-
+        const profile = profiler.stopProfiling(opts.profileName);
         profile.export()
           .pipe(fs.createWriteStream(opts.outputFile))
-          .once('error', (e) => {
-            profiler.deleteAllProfiles();
-            reject(e);
-          })
-          .once('finish', () => {
-            profiler.deleteAllProfiles();
-
-            // we only need to do this once for all reports
-            this[SIGNIFICANT_NODES] = getSignificantNodes(this);
-
-            // generate reports
-            consoleReporter(this);
-            fileReporter(this);
-            if (opts.flamegraph) {
-              flamegraphReporter(this);
-            }
-          });
+          .once('error', reject)
+          .once('finish', generateReports(this, opts.flamegraph));
         profiler.deleteAllProfiles();
-        this.log('Application profiling stopped');
         resolve();
       });
       return promise;
@@ -101,6 +85,20 @@ class Genet {
   }
 }
 
+function generateReports (genet, flamegraph) {
+  return function () {
+    // we only need to do this once for all reports
+    genet[SIGNIFICANT_NODES] = getSignificantNodes(genet);
+
+    // generate reports
+    consoleReporter(genet);
+    fileReporter(genet);
+    if (flamegraph) {
+      flamegraphReporter(genet);
+    }
+  }
+}
+
 function getOptions (options) {
   const opts = {
     profileName: 'genet',
@@ -109,7 +107,7 @@ function getOptions (options) {
     verbose: false,
     showAppOnly: false,
     flamegraph: false,
-    filter: ''
+    filter: /./
   };
   Object.assign(opts, options);
   return opts;
@@ -128,12 +126,11 @@ function getSignificantNodes (genet) {
   Object.keys(parsed.nodes).map((i) => {
     let node = parsed.nodes[i];
     if (node.func.toString().includes('.js')) {
-      if (genet.filter) {
-        if (node.func.toString().includes(genet.filter)) {
-          node.depth = node.etime - node.stime;
-          nodes.push(node);
-        }
-      } else {
+      // String.prototype.search automatically converts
+      // a String parameter to a RegExp using new RegExp()
+      // so this search should be safe for either RegExp
+      // or String options on genet.filter.
+      if (~node.func.toString().search(genet.filter)) {
         node.depth = node.etime - node.stime;
         nodes.push(node);
       }
