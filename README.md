@@ -1,6 +1,8 @@
 # genet
 
-[![Build Status](https://travis-ci.org/bucharest-gold/genet.svg?branch=master)](https://travis-ci.org/bucharest-gold/genet) [![Known Vulnerabilities](https://snyk.io/test/npm/genet/badge.svg)](https://snyk.io/test/npm/genet) [![dependencies Status](https://david-dm.org/bucharest-gold/genet/status.svg)](https://david-dm.org/bucharest-gold/genet)
+[![Coverage Status](https://coveralls.io/repos/github/bucharest-gold/genet/badge.svg?branch=master)](https://coveralls.io/github/bucharest-gold/genet?branch=master)
+[![Build Status](https://travis-ci.org/bucharest-gold/genet.svg?branch=master)](https://travis-ci.org/bucharest-gold/genet) 
+[![Known Vulnerabilities](https://snyk.io/test/npm/genet/badge.svg)](https://snyk.io/test/npm/genet) [![dependencies Status](https://david-dm.org/bucharest-gold/genet/status.svg)](https://david-dm.org/bucharest-gold/genet)
 
 [![NPM](https://nodei.co/npm/genet.png)](https://npmjs.org/package/genet)
 
@@ -18,7 +20,11 @@ A Node.js application profiling tool.
 This is a simple Node.js profiling tool. Use it like this.
 First add it to your project.
 
-    $ npm install --save genet
+## Installation
+
+    $ npm install genet -S
+
+## Usage
 
 Then start profiling. Put this somewhere in your app. Probably
 near the start.
@@ -38,8 +44,6 @@ const profile = new Genet({
 profile.start();
 ```
 
-### Example using
-
 The `outputFile` option can be a name, or a function. If you
 provide a function, it will be called and the return value will
 be used as the output file location. By default, the value is
@@ -53,3 +57,7 @@ By default, `genet` will generate a report to the console, and to a file. Using 
 Console output will look something like this.
 
 ![alt example](https://cloud.githubusercontent.com/assets/6443576/18143076/e99fca90-6f96-11e6-8bf2-da3ebaacdd8d.png)
+
+## Contributing
+
+Please read the [contributing guide](./CONTRIBUTING.md)
