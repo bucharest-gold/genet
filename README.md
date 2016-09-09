@@ -31,23 +31,48 @@ near the start.
 
 ```javascript
 const Genet = require('genet');
-const profile = new Genet({
-    profileName: 'myAppProfile', // default 'genet'
-    outputFile: './pathToSomeFile.cpuprofile',
-    duration: 5000, // default 5000 (ms)
-    verbose: true, // default false
-    report: false, // default true
-    showAppOnly: true, // default false
-    flamegraph: true, // Generates a flamegraph.svg file - default false
-    filter: 'myModule' // Filter data to only include 'myModule' - default ''
-});
+const profile = new Genet();
 profile.start();
 ```
 
-The `outputFile` option can be a name, or a function. If you
-provide a function, it will be called and the return value will
-be used as the output file location. By default, the value is
-``./prof-${Date.now()}.cpuprofile``.
+## API
+
+When requiring the `genet` module, the module exports the `Genet` object's
+constructor function.
+
+```javascript
+// Genet is a constructor function
+const Genet = require('genet');
+var profile = new Genet();
+```
+
+### `new Genet(options)`
+
+Creates a new profiler. Several options are allowed.
+
+* `options.profileName` {string} - The profile name provided to `v8-profiler`.
+  Defaults to `'genet'`.
+* `options.outputFile` {string} - The output file name.
+  Defaults to ``./prof-${Date.now()}.cpuprofile``.
+* `options.duration` {Number} - The number of milliseconds to run the profiler. Defaults to 5000.
+* `options.verbose` {boolean} - Determines how much log output you'll see. Defaults to `false`.
+* `options.report` {boolean} - Whether or not to generate report output. Defaults to `true`.
+* `options.flamegraph` {boolean} - Determines whether to generate a flamegraph .svg file.
+  Defaults to `false`.
+* `options.filter` {RegExp|String} - An inclusive filter which determines what functions to
+  include in the reports based on comparison with the path and filename for a given function.
+
+### profile.start()
+
+Begins profiling the application. The profiler will run until `options.duration` milliseconds
+have elapsed, and then generate reports.
+
+### profile.stop()
+
+Stops profiling the application. If the profiler has already been stopped, this function
+does nothing. If the profiler is still running, it cancels the timeout set by `options.duration`
+and then stops the profiler. This function returns a promise that resolves when the
+profiler has stopped.
 
 ## Reporters
 
