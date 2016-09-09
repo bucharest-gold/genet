@@ -52,16 +52,18 @@ class Genet {
       this[STOPPED] = true;
       this[TIMEOUT] = null;
 
-      const promise = new Fidelity((resolve, reject) => {
+      return new Fidelity((resolve, reject) => {
         const profile = profiler.stopProfiling(opts.profileName);
         profile.export()
           .pipe(fs.createWriteStream(opts.outputFile))
           .once('error', reject)
-          .once('finish', generateReports(this, opts.flamegraph));
+          .once('finish', () => {
+            generateReports(this, opts.flamegraph)
+              .then(resolve)
+              .catch(reject);
+          });
         profiler.deleteAllProfiles();
-        resolve();
       });
-      return promise;
     } else {
       return Fidelity.resolve();
     }
@@ -85,17 +87,17 @@ class Genet {
 }
 
 function generateReports (genet, flamegraph) {
-  return function () {
-    // we only need to do this once for all reports
-    genet[SIGNIFICANT_NODES] = getSignificantNodes(genet);
+  // we only need to do this once for all reports
+  genet[SIGNIFICANT_NODES] = getSignificantNodes(genet);
 
-    // generate reports
-    consoleReporter(genet);
-    fileReporter(genet);
-    if (flamegraph) {
-      flamegraphReporter(genet);
-    }
-  };
+  // generate reports
+  return consoleReporter(genet)
+    .then(() => fileReporter(genet))
+    .then(() => {
+      if (flamegraph) {
+        return flamegraphReporter(genet);
+      }
+    });
 }
 
 function getOptions (options) {
