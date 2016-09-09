@@ -1,7 +1,7 @@
 # genet
 
 [![Coverage Status](https://coveralls.io/repos/github/bucharest-gold/genet/badge.svg?branch=master)](https://coveralls.io/github/bucharest-gold/genet?branch=master)
-[![Build Status](https://travis-ci.org/bucharest-gold/genet.svg?branch=master)](https://travis-ci.org/bucharest-gold/genet) 
+[![Build Status](https://travis-ci.org/bucharest-gold/genet.svg?branch=master)](https://travis-ci.org/bucharest-gold/genet)
 [![Known Vulnerabilities](https://snyk.io/test/npm/genet/badge.svg)](https://snyk.io/test/npm/genet) [![dependencies Status](https://david-dm.org/bucharest-gold/genet/status.svg)](https://david-dm.org/bucharest-gold/genet)
 
 [![NPM](https://nodei.co/npm/genet.png)](https://npmjs.org/package/genet)
@@ -56,7 +56,11 @@ By default, `genet` will generate a report to the console, and to a file. Using 
 
 Console output will look something like this.
 
-![alt example](https://cloud.githubusercontent.com/assets/6443576/18143076/e99fca90-6f96-11e6-8bf2-da3ebaacdd8d.png)
+![alt example](http://new.tinygrab.com/fda4615e9c62094ff7397e78a1e9e2f5f2665cabe4.png)
+
+The flamegraph SVG might look something like this.
+
+![alt flamegraph](http://new.tinygrab.com/fda4615e9c5dfe16be98cd5a1eb4e528cb181a1a2f.png)
 
 ## Contributing
 
