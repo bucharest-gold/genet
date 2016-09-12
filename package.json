@@ -1,13 +1,14 @@
 {
   "name": "genet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A node.js profiling tool",
   "main": "index.js",
   "files": [
     "index.js",
     "LICENSE.txt",
     "README.md",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "lib"
   ],
   "scripts": {
     "lint": "eslint index.js lib/*.js test/*.js",
