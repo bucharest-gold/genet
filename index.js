@@ -5,7 +5,7 @@ const fs = require('fs');
 
 // some profiler dependencies
 const profiler = require('v8-profiler');
-const processor = require('flamegraph/lib/cpuprofile-processor');
+const processor = require('huilu/lib/cpuprofile-processor');
 const Fidelity = require('fidelity');
 
 // Builtin reporters
