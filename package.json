@@ -14,7 +14,8 @@
     "lint": "eslint index.js lib/*.js test/*.js",
     "test": "tape test/genet-test.js | tap-spec",
     "prepublish": "nsp check",
-    "coverage": "istanbul cover tape test/genet-test.js"
+    "coverage": "istanbul cover tape test/genet-test.js",
+    "dependencyCheck": "szero . --ci=true"
   },
   "repository": {
     "type": "git",

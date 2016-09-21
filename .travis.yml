@@ -5,6 +5,7 @@ node_js:
   - "6"
 before_script:
   - npm install -g coveralls
+  - npm install -g szero
 script:
   - make ci
 notifications:

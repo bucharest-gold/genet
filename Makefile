@@ -4,6 +4,7 @@ ci: test
 
 test: lint
 	npm test
+	npm run dependencyCheck
 
 lint: node_modules
 	npm run lint
