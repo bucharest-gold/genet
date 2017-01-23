@@ -4,7 +4,7 @@
 const fs = require('fs');
 
 // some profiler dependencies
-const profiler = require('v8-profiler');
+const profiler = require('@risingstack/v8-profiler');
 const processor = require('huilu/lib/cpuprofile-processor');
 const Fidelity = require('fidelity');
 

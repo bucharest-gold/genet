@@ -41,7 +41,7 @@
     "cli-table2": "~0.2.0",
     "fidelity": "~4.0.0",
     "huilu": "^0.1.0",
-    "v8-profiler": "~5.6.5"
+    "@risingstack/v8-profiler": "^5.7.0"
   },
   "devDependencies": {
     "eslint": "^3.4.0",
