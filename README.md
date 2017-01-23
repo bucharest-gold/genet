@@ -14,7 +14,7 @@ A Node.js application profiling tool.
 | Build:          | make  |
 | Documentation:  | http://bucharest-gold.github.io/genet/  |
 | Issue tracker:  | https://github.com/bucharest-gold/genet/issues  |
-| Engines:        | Node.js 4.x, 5.x, 6.x
+| Engines:        | Node.js 4.x, 6.x, 7.x
 
 
 This is a simple Node.js profiling tool. Use it like this.
