@@ -1,6 +1,5 @@
 ci: test
 	npm run prepublish
-	npm run coverage
 
 test: lint
 	npm test

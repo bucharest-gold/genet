@@ -12,4 +12,5 @@ script:
 notifications:
   irc: "chat.freenode.net#brass-monkey"
 after_success:
+  - npm run coverage
   - cat ./coverage/lcov.info | coveralls

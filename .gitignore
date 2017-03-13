@@ -5,3 +5,4 @@ node_modules
 *.logcoverage
 coverage
 *.log
+.nyc_output/
