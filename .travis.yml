@@ -10,7 +10,7 @@ before_script:
 script:
   - make ci
 notifications:
-  irc: "chat.freenode.net#brass-monkey"
+  irc: "chat.freenode.net#bucharest-gold"
 after_success:
   - npm run coverage
   - cat ./coverage/lcov.info | coveralls
