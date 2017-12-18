@@ -8,28 +8,21 @@
 
 A Node.js application profiling tool.
 
-|                 | Project Info  |
-| --------------- | ------------- |
-| License:        | Apache-2.0  |
-| Build:          | make  |
-| Documentation:  | http://bucharest-gold.github.io/genet/  |
-| Issue tracker:  | https://github.com/bucharest-gold/genet/issues  |
-| Engines:        | Node.js 4.x, 6.x, 8.x
-
-
 This is a simple Node.js profiling tool. Use it like this.
 First add it to your project.
 
 ## Installation
 
-    $ npm install genet -S
+```console
+$ npm install genet -S
+```
 
 ## Usage
 
 Then start profiling. Put this somewhere in your app. Probably
 near the start.
 
-```javascript
+```js
 const Genet = require('genet');
 const profile = new Genet();
 profile.start();
@@ -40,7 +33,7 @@ profile.start();
 When requiring the `genet` module, the module exports the `Genet` object's
 constructor function.
 
-```javascript
+```js
 // Genet is a constructor function
 const Genet = require('genet');
 var profile = new Genet();
